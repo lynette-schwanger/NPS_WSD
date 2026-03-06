@@ -41,6 +41,8 @@ parks_centroid <- parks %>%
     Latitude = st_coordinates(.)[, 2]
   )
 
+mapview(parks_centroid)
+
 ```
 
 Read in and clean up the water supply database for plotting
@@ -91,6 +93,9 @@ source_table_clean <- source_table %>%
                    source_type == "spring" ~ "Spring",
                 TRUE ~ source_type)) 
 
+
+mapview(source_table_clean,
+        zcol = "source_type")
 
 ```
 
