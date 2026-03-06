@@ -437,66 +437,6 @@ mapview(USGWD %>%
 
 ```
 
-# Test to plot using NPS Basemaps - hard to work with in R as of now
-
-```{r}
-library("leaflet")
-
-pal <- colorFactor(
-  palette = "Dark2",
-  domain = source_table_clean$source_type
-)
-
-
-# NPS Park Tiles for map background:
-tileURL  <- "https://atlas-stg.geoplatform.gov/styles/v1/atlas-user/ck58pyquo009v01p99xebegr9/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYXRsYXMtdXNlciIsImEiOiJjazFmdGx2bjQwMDAwMG5wZmYwbmJwbmE2In0.lWXK2UexpXuyVitesLdwUg&"
-tile_attribution <- '"NPS"'
-#park_boundary <- getParkBoundary()
-
-pt <- st_centroid(parks %>% dplyr::filter(STATE == "NE")) %>%
-  st_coordinates()
-
-#bounds <- st_bbox(parks %>% st_buffer(5000))
-
-test_map <- leaflet::leaflet() %>%
-  leaflet::addTiles(urlTemplate = tileURL) %>%
-  leaflet::setView(lat = pt[[1,2]], pt[[1,1]], zoom = 3) %>%
-  #leaflet::fitBounds(lng1 = west, lat1 = south, lng2 = east, lat2 = north) %>%
-  addScaleBar(position = c("bottomright"),
-              options = scaleBarOptions(updateWhenIdle = FALSE)) %>%
-  #leaflet::addCircleMarkers()
-  # addPolygons(data = alluvium, # Use addPolygons() for polygons
-  #            color = "yellow", # Set the border color
-  #            weight = 2, # Set the border weight
-  #            fillColor = "yellow", # Set the fill color
-  #            fillOpacity = 0.3) %>% # Set the fill opacity) %>%
-  addCircleMarkers(
-    data = source_table_clean,
-    # Use the column names directly without the '$' when 'data' is specified
-    lng = ~source_longitude,
-    lat = ~source_latitude,
-    color = "black", # Sets the border color
-    fillColor = ~pal(source_type), # Sets the fill color
-    fillOpacity = 0.7, # Make the markers slightly transparent
-    stroke = FALSE, # Ensure the border color is visible
-    radius = 5, # Increased radius slightly so color is more visible
-    group = ~source_type # Still good practice to group for layer control
-  ) %>%
-  
-  # 4. Add a Legend (Crucial for explaining the colors)
-  addLegend(
-    pal = pal,
-    values = source_table_clean$source_type,
-    title = "Source Type",
-    opacity = 1
-  )
-
-test_map
- 
-
-
-```
-
 
 ```{r}
 
