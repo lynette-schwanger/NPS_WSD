@@ -19,7 +19,7 @@ After linking, you'll need to restart R.
 ```{r setup, include=FALSE}
 source("setup.R")
 
-mapviewOptions(basemaps = c("OpenStreetMap","Esri.WorldImagery", "Esri.WorldShadedRelief"))
+mapviewOptions(basemaps = c("CartoDB.Positron", "OpenStreetMap","Esri.WorldImagery", "Esri.WorldShadedRelief"))
 
 ```
 
@@ -27,7 +27,7 @@ mapviewOptions(basemaps = c("OpenStreetMap","Esri.WorldImagery", "Esri.WorldShad
 
 ```{r park_boundary}
 
-park <- "MOJA"
+park <- "ACAD"
 
 pb <- getParkBoundary(park) %>%
   st_transform(4326)
@@ -66,11 +66,12 @@ usgwd <-
 # don't think it's easy to just download the whole state and filter in R
 # https://dwr.maps.arcgis.com/apps/webappviewer/index.html?id=181078580a214c0986e2da28f8623b37
 wells <- 
-  read_csv("data/Water_Supply_Systems/data_sources/California/Mojave_Well_Completion_Reports.csv") %>%
+  read_csv("data/Water_Supply_Systems/data_sources/Maine/ME_Wells.csv") %>%
   clean_names() %>%
-  st_as_sf(coords = c("decimal_longitude", "decimal_latitude"), crs = 4326) %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
   add_wgs_coords() %>%
-  st_filter(aoi)
+  st_filter(aoi) %>%
+  filter(longitude_wgs84 < 100)
 
 # Read in water rights database diversion points
 # For California, https://www.waterboards.ca.gov/waterrights/water_issues/programs/ewrims/
@@ -140,12 +141,12 @@ mapview(wells,
         col.regions = "tomato",
         layer.name = "State Well DB",
         cex = 4) +
-mapview(pws_boundaries,
-        col.regions = "dodgerblue",
-        alpha.regions = 0.5) +
-mapview(pods,
-        col.regions = "hotpink",
-        cex = 5) +
+#mapview(pws_boundaries,
+#        col.regions = "dodgerblue",
+#        alpha.regions = 0.5) +
+#mapview(pods,
+#        col.regions = "hotpink",
+#        cex = 5) +
   mapview(select_sources, 
           col.regions = "navy",
           layer.name = "NPS WSD",
@@ -161,7 +162,7 @@ mapview(pods,
 
 ```{r search_buildings}
 
-search_str <- "sand"
+search_str <- "bird"
 
 bldg <- bldg_all %>% 
   dplyr::select(BLDGNAME, BLDGALTNAM, MAPLABEL, BLDGSTATUS, BLDGTYPE, FACOWNER, FACOCCUPAN, FACMAINTAI, FACUSE, SEASONAL, UNITCODE, UNITNAME) %>%
@@ -183,5 +184,33 @@ mapview(sel_bldg, layer.name = "select_buildings") +
 
 
 ```
+
+
+
+# little script to quickly search points of interest for a given park
+
+```{r search_buildings}
+
+search_str <- "bar"
+
+pois <- get_pois(aoi) %>% 
+  st_transform(4326) %>% # transform to WGS 84 and add coordinates to bldg
+  st_centroid() %>%
+  dplyr::mutate(
+    # The st_coordinates output is a matrix, so we access columns by index
+    X = sf::st_coordinates(.)[, 1],
+    Y = sf::st_coordinates(.)[, 2]
+  ) 
+
+sel_pois <- pois %>% 
+          dplyr::filter((grepl(search_str, MAPLABEL, ignore.case = TRUE) |
+                        grepl(search_str, NOTES, ignore.case = TRUE)))
+
+mapview(sel_pois, layer.name = "select_pois") +
+  mapview(pb)
+
+
+```
+
 
 
