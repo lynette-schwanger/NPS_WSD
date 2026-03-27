@@ -95,7 +95,7 @@ source_table_clean <- source_table %>%
 
 
 mapview(source_table_clean,
-        zcol = "source_type")
+        zcol = "source_")
 
 ```
 
