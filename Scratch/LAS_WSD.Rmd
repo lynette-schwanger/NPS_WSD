@@ -27,7 +27,7 @@ mapviewOptions(basemaps = c("CartoDB.Positron", "OpenStreetMap","Esri.WorldImage
 
 ```{r park_boundary}
 
-park <- "LACL"
+park <- "PIRO"
 
 pb <- getParkBoundary(park) %>%
   st_transform(4326)
@@ -61,7 +61,7 @@ mapview(bldg)
 
 ```{r search_buildings}
 
-search_str <- "silver"
+search_str <- "well"
 
 bldg <- bldg_all %>% 
   dplyr::select(BLDGNAME, BLDGALTNAM, MAPLABEL, BLDGSTATUS, BLDGTYPE, FACOWNER, FACOCCUPAN, FACMAINTAI, FACUSE, SEASONAL, UNITCODE, UNITNAME) %>%
@@ -90,7 +90,7 @@ mapview(sel_bldg, layer.name = "select_buildings") +
 
 ```{r search_pois}
 
-search_str <- "quincy"
+search_str <- "marais"
 
 pois <- get_pois(aoi) %>% 
   st_transform(4326) %>% # transform to WGS 84 and add coordinates to bldg
